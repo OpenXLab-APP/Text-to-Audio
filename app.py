@@ -16,3 +16,4 @@ from diffusers import PNDMScheduler
 import matplotlib.pyplot as plt
 from scipy.io.wavfile import write
 
+import gradio as gr
