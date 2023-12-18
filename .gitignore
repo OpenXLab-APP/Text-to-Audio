@@ -35,16 +35,16 @@ egs/svc/dev_exp_config.json
 bins/svc/demo*
 bins/svc/preprocess_custom.py
 data
-ckpts
+# ckpts
 
 # Data and ckpt
 *.pkl
-*.pt
+# *.pt
 *.npy
 *.npz
 !modules/whisper_extractor/assets/mel_filters.npz
 *.tar.gz
-*.ckpt
+# *.ckpt
 *.wav
 *.flac
 pretrained/wenet/*conformer_exp
