@@ -19,6 +19,7 @@ from scipy.io.wavfile import write
 from utils.util import load_config
 import gradio as gr
 
+
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
         super(AttrDict, self).__init__(*args, **kwargs)
@@ -35,15 +36,19 @@ def build_autoencoderkl(cfg, device):
     autoencoderkl.eval()
     return autoencoderkl
 
+
 def build_textencoder(device):
-    # tokenizer = AutoTokenizer.from_pretrained("t5-base", model_max_length=512)
-    # text_encoder = T5EncoderModel.from_pretrained("t5-base")
-    tokenizer = AutoTokenizer.from_pretrained("ckpts/tta/tokenizer")
-    text_encoder = T5EncoderModel.from_pretrained("ckpts/tta/text_encoder")
+    try:
+        tokenizer = AutoTokenizer.from_pretrained("t5-base", model_max_length=512)
+        text_encoder = T5EncoderModel.from_pretrained("t5-base")
+    except:
+        tokenizer = AutoTokenizer.from_pretrained("ckpts/tta/tokenizer")
+        text_encoder = T5EncoderModel.from_pretrained("ckpts/tta/text_encoder")
     text_encoder = text_encoder.to(device=device)
     text_encoder.requires_grad_(requires_grad=False)
     text_encoder.eval()
     return tokenizer, text_encoder
+
 
 def build_vocoder(device):
     config_file = os.path.join("ckpts/tta/hifigan_checkpoints/config.json")
@@ -58,12 +63,13 @@ def build_vocoder(device):
     vocoder.load_state_dict(checkpoint_dict["generator"])
     return vocoder
 
+
 def build_model(cfg):
     model = AudioLDM(cfg.model.audioldm)
     return model
 
-def get_text_embedding(text, tokenizer, text_encoder, device):
 
+def get_text_embedding(text, tokenizer, text_encoder, device):
     prompt = [text]
 
     text_input = tokenizer(
@@ -73,28 +79,24 @@ def get_text_embedding(text, tokenizer, text_encoder, device):
         padding="do_not_pad",
         return_tensors="pt",
     )
-    text_embeddings = text_encoder(
-        text_input.input_ids.to(device)
-    )[0]
+    text_embeddings = text_encoder(text_input.input_ids.to(device))[0]
 
     max_length = text_input.input_ids.shape[-1]
     uncond_input = tokenizer(
         [""] * 1, padding="max_length", max_length=max_length, return_tensors="pt"
     )
-    uncond_embeddings = text_encoder(
-        uncond_input.input_ids.to(device)
-    )[0]
+    uncond_embeddings = text_encoder(uncond_input.input_ids.to(device))[0]
     text_embeddings = torch.cat([uncond_embeddings, text_embeddings])
 
     return text_embeddings
-    
-def tta_inference(
-        text,
-        guidance_scale=4,
-        diffusion_steps=100,
-):
 
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+def tta_inference(
+    text,
+    guidance_scale=4,
+    diffusion_steps=100,
+):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     os.environ["WORK_DIR"] = "./"
     cfg = load_config("egs/tta/audioldm/exp_config.json")
@@ -125,7 +127,6 @@ def tta_inference(
     )
 
     noise_scheduler.set_timesteps(num_steps)
-
 
     latents = torch.randn(
         (
@@ -189,6 +190,7 @@ def tta_inference(
 
     return os.path.join("result", text + ".wav")
 
+
 demo_inputs = [
     gr.Textbox(
         value="birds singing and a man whistling",
@@ -218,15 +220,8 @@ demo = gr.Interface(
     fn=tta_inference,
     inputs=demo_inputs,
     outputs=demo_outputs,
-    title="Amphion Text to Audio"
+    title="Amphion Text to Audio",
 )
 
 if __name__ == "__main__":
     demo.launch()
-
-
-
-
-
-
-
