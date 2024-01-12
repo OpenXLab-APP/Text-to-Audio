@@ -20,10 +20,10 @@ from utils.util import load_config
 import gradio as gr
 
 from openxlab.model import download
-download(model_repo='Amphion/Text-to-Audio', model_name='g_01250000', output='ckpts/tta/hifigan_checkpoints')
-download(model_repo='Amphion/Text-to-Audio', model_name='step-0570000_loss-0.2521', output='ckpts/tta/audioldm_debug_latent_size_4_5_39/checkpoints')
-download(model_repo='Amphion/Text-to-Audio', model_name='step-0445000_loss-0.3306', output='ckpts/tta/autoencoder_kl_debug/checkpoints')
-download(model_repo='Amphion/Text-to-Audio', model_name='pytorch_model', output='ckpts/tta/text_encoder')
+download(model_repo='Amphion/Text-to-Audio', model_name='g_01250000', output='ckpts/tta/hifigan_checkpoints',overwrite=True)
+download(model_repo='Amphion/Text-to-Audio', model_name='step-0570000_loss-0.2521', output='ckpts/tta/audioldm_debug_latent_size_4_5_39/checkpoints',overwrite=True)
+download(model_repo='Amphion/Text-to-Audio', model_name='step-0445000_loss-0.3306', output='ckpts/tta/autoencoder_kl_debug/checkpoints',overwrite=True)
+download(model_repo='Amphion/Text-to-Audio', model_name='pytorch_model', output='ckpts/tta/text_encoder',overwrite=True)
 
 
 class AttrDict(dict):
